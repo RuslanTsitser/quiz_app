@@ -1,4 +1,4 @@
-import '../models/question.dart';
+import '../domain/models/question.dart';
 
 class QuizData {
   static const List<Question> questions = [
