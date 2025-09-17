@@ -26,5 +26,7 @@
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
 	<string>1:415113993788:ios:74ecc2cc5ad9c09b2bed39</string>
+	<key>DATABASE_URL</key>
+	<string>https://quiz-app-hello-world-default-rtdb.europe-west1.firebasedatabase.app</string>
 </dict>
 </plist>

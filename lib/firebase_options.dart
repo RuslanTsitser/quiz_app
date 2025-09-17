@@ -46,6 +46,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '415113993788',
     projectId: 'quiz-app-hello-world',
     authDomain: 'quiz-app-hello-world.firebaseapp.com',
+    databaseURL: 'https://quiz-app-hello-world-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'quiz-app-hello-world.firebasestorage.app',
   );
 
@@ -54,6 +55,7 @@ class DefaultFirebaseOptions {
     appId: '1:415113993788:android:db4610e59b61ddd42bed39',
     messagingSenderId: '415113993788',
     projectId: 'quiz-app-hello-world',
+    databaseURL: 'https://quiz-app-hello-world-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'quiz-app-hello-world.firebasestorage.app',
   );
 
@@ -62,6 +64,7 @@ class DefaultFirebaseOptions {
     appId: '1:415113993788:ios:74ecc2cc5ad9c09b2bed39',
     messagingSenderId: '415113993788',
     projectId: 'quiz-app-hello-world',
+    databaseURL: 'https://quiz-app-hello-world-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'quiz-app-hello-world.firebasestorage.app',
     iosBundleId: 'com.example.quizApp',
   );
@@ -71,6 +74,7 @@ class DefaultFirebaseOptions {
     appId: '1:415113993788:ios:74ecc2cc5ad9c09b2bed39',
     messagingSenderId: '415113993788',
     projectId: 'quiz-app-hello-world',
+    databaseURL: 'https://quiz-app-hello-world-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'quiz-app-hello-world.firebasestorage.app',
     iosBundleId: 'com.example.quizApp',
   );
@@ -81,6 +85,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '415113993788',
     projectId: 'quiz-app-hello-world',
     authDomain: 'quiz-app-hello-world.firebaseapp.com',
+    databaseURL: 'https://quiz-app-hello-world-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'quiz-app-hello-world.firebasestorage.app',
   );
+
 }

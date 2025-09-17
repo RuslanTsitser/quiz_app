@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "415113993788",
+    "firebase_url": "https://quiz-app-hello-world-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "quiz-app-hello-world",
     "storage_bucket": "quiz-app-hello-world.firebasestorage.app"
   },
