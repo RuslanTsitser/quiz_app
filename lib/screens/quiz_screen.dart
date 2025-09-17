@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../data/quiz_data.dart';
+import '../models/question.dart';
 import '../models/quiz_result.dart';
 import 'result_screen.dart';
 
 class QuizScreen extends StatefulWidget {
-  const QuizScreen({super.key});
+  const QuizScreen({super.key, required this.questions});
+  final List<Question> questions;
 
   @override
   State<QuizScreen> createState() => _QuizScreenState();
@@ -25,11 +26,11 @@ class _QuizScreenState extends State<QuizScreen> {
   void _nextQuestion() {
     if (selectedAnswerIndex == null) return;
 
-    if (selectedAnswerIndex == QuizData.questions[currentQuestionIndex].correctAnswerIndex) {
+    if (widget.questions[currentQuestionIndex].correctAnswerIndexes.contains(selectedAnswerIndex)) {
       correctAnswers++;
     }
 
-    if (currentQuestionIndex < QuizData.questions.length - 1) {
+    if (currentQuestionIndex < widget.questions.length - 1) {
       setState(() {
         currentQuestionIndex++;
         selectedAnswerIndex = null;
@@ -41,19 +42,27 @@ class _QuizScreenState extends State<QuizScreen> {
 
   void _finishQuiz() {
     final result = QuizResult(
-      totalQuestions: QuizData.questions.length,
+      totalQuestions: widget.questions.length,
       correctAnswers: correctAnswers,
-      wrongAnswers: QuizData.questions.length - correctAnswers,
-      percentage: (correctAnswers / QuizData.questions.length) * 100,
+      wrongAnswers: widget.questions.length - correctAnswers,
+      percentage: (correctAnswers / widget.questions.length) * 100,
     );
 
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ResultScreen(result: result)));
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ResultScreen(
+          result: result,
+          questions: widget.questions,
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final question = QuizData.questions[currentQuestionIndex];
-    final isLastQuestion = currentQuestionIndex == QuizData.questions.length - 1;
+    final question = widget.questions[currentQuestionIndex];
+    final isLastQuestion = currentQuestionIndex == widget.questions.length - 1;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Квиз'), backgroundColor: Theme.of(context).colorScheme.inversePrimary),
@@ -64,7 +73,7 @@ class _QuizScreenState extends State<QuizScreen> {
           children: [
             // Прогресс-бар
             LinearProgressIndicator(
-              value: (currentQuestionIndex + 1) / QuizData.questions.length,
+              value: (currentQuestionIndex + 1) / widget.questions.length,
               backgroundColor: Colors.grey[300],
               valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
             ),
@@ -72,7 +81,7 @@ class _QuizScreenState extends State<QuizScreen> {
 
             // Номер вопроса
             Text(
-              'Вопрос ${currentQuestionIndex + 1} из ${QuizData.questions.length}',
+              'Вопрос ${currentQuestionIndex + 1} из ${widget.questions.length}',
               style: Theme.of(context).textTheme.titleMedium,
               textAlign: TextAlign.center,
             ),
@@ -100,7 +109,7 @@ class _QuizScreenState extends State<QuizScreen> {
                 itemCount: question.options.length,
                 itemBuilder: (context, index) {
                   final isSelected = selectedAnswerIndex == index;
-                  final isCorrect = index == question.correctAnswerIndex;
+                  final isCorrect = question.correctAnswerIndexes.contains(index);
 
                   Color? backgroundColor;
                   Color? borderColor;

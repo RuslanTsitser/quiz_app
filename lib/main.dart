@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'data/quiz_data.dart';
 import 'screens/home_screen.dart';
 
 void main() {
@@ -25,7 +26,7 @@ class QuizApp extends StatelessWidget {
         ),
         cardTheme: CardThemeData(elevation: 2, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
       ),
-      home: const HomeScreen(),
+      home: const HomeScreen(questions: QuizData.questions),
       debugShowCheckedModeBanner: false,
     );
   }

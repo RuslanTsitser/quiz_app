@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../models/question.dart';
 import '../models/quiz_result.dart';
 import 'quiz_screen.dart';
 
 class ResultScreen extends StatelessWidget {
   final QuizResult result;
+  final List<Question> questions;
 
-  const ResultScreen({super.key, required this.result});
+  const ResultScreen({super.key, required this.result, required this.questions});
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +76,12 @@ class ResultScreen extends StatelessWidget {
             // Кнопки действий
             ElevatedButton.icon(
               onPressed: () {
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const QuizScreen()));
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => QuizScreen(questions: questions),
+                  ),
+                );
               },
               icon: const Icon(Icons.refresh),
               label: const Text('Пройти квиз снова'),

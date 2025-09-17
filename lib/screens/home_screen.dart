@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../models/question.dart';
 import 'quiz_screen.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, required this.questions});
+  final List<Question> questions;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +36,7 @@ class HomeScreen extends StatelessWidget {
             // Описание
             Text(
               'Проверьте свои знания в увлекательной викторине. '
-              'Ответьте на 10 вопросов и узнайте свой результат!',
+              'Ответьте на ${questions.length} вопросов и узнайте свой результат!',
               style: Theme.of(
                 context,
               ).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
@@ -56,7 +58,7 @@ class HomeScreen extends StatelessWidget {
                     children: [
                       Icon(Icons.help_outline, color: Theme.of(context).colorScheme.primary),
                       const SizedBox(width: 12),
-                      Text('10 вопросов', style: Theme.of(context).textTheme.titleMedium),
+                      Text('${questions.length} вопросов', style: Theme.of(context).textTheme.titleMedium),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -83,7 +85,12 @@ class HomeScreen extends StatelessWidget {
             // Кнопка начала квиза
             ElevatedButton.icon(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const QuizScreen()));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => QuizScreen(questions: questions),
+                  ),
+                );
               },
               icon: const Icon(Icons.play_arrow),
               label: const Text('Начать квиз'),
