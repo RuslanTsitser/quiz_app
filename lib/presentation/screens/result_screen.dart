@@ -18,10 +18,9 @@ class ResultScreen extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         automaticallyImplyLeading: false,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Иконка результата
@@ -71,7 +70,27 @@ class ResultScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 32),
+
+            // Список вопросов и ответов
+            Text(
+              'Вопросы и правильные ответы:',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: questions.length,
+              itemBuilder: (context, index) {
+                return _buildQuestionCard(context, questions[index], index + 1);
+              },
+            ),
+
+            const SizedBox(height: 32),
 
             // Кнопки действий
             ElevatedButton.icon(
@@ -126,6 +145,128 @@ class ResultScreen extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildQuestionCard(BuildContext context, Question question, int questionNumber) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Номер вопроса и текст
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Center(
+                  child: Text(
+                    questionNumber.toString(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  question.questionText,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Варианты ответов
+          ...question.options.asMap().entries.map((entry) {
+            final index = entry.key;
+            final option = entry.value;
+            final isCorrect = question.correctAnswerIndexes.contains(index);
+
+            return Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: isCorrect
+                    ? Colors.green.withOpacity(0.1)
+                    : Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: isCorrect
+                      ? Colors.green.withOpacity(0.5)
+                      : Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                  width: isCorrect ? 2 : 1,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isCorrect ? Colors.green : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                    ),
+                    child: Center(
+                      child: Text(
+                        String.fromCharCode(65 + index), // A, B, C, D
+                        style: TextStyle(
+                          color: isCorrect ? Colors.white : Colors.black87,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      option,
+                      style: TextStyle(
+                        color: isCorrect ? Colors.green[800] : Theme.of(context).colorScheme.onSurface,
+                        fontWeight: isCorrect ? FontWeight.w600 : FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                  if (isCorrect)
+                    const Icon(
+                      Icons.check_circle,
+                      color: Colors.green,
+                      size: 20,
+                    ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
     );
   }
 
