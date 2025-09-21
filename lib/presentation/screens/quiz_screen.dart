@@ -15,29 +15,56 @@ class QuizScreen extends StatefulWidget {
 class _QuizScreenState extends State<QuizScreen> {
   int currentQuestionIndex = 0;
   int correctAnswers = 0;
-  int? selectedAnswerIndex;
+  Set<int> selectedAnswerIndex = {};
+  List<Set<int>> selectedAnswersForEachQuestion = [];
 
   void _selectAnswer(int answerIndex) {
     setState(() {
-      selectedAnswerIndex = answerIndex;
+      if (selectedAnswerIndex.contains(answerIndex)) {
+        selectedAnswerIndex.remove(answerIndex);
+      } else {
+        selectedAnswerIndex.add(answerIndex);
+      }
     });
   }
 
   void _nextQuestion() {
-    if (selectedAnswerIndex == null) return;
+    if (selectedAnswerIndex.isEmpty) return;
 
-    if (widget.questions[currentQuestionIndex].correctAnswerIndexes.contains(selectedAnswerIndex)) {
+    // Сохраняем выбранные ответы для текущего вопроса
+    selectedAnswersForEachQuestion.add(Set.from(selectedAnswerIndex));
+
+    // Проверяем, правильно ли отвечен вопрос
+    final question = widget.questions[currentQuestionIndex];
+    final isCorrect = _isQuestionAnsweredCorrectly(question, selectedAnswerIndex);
+
+    if (isCorrect) {
       correctAnswers++;
     }
 
     if (currentQuestionIndex < widget.questions.length - 1) {
       setState(() {
         currentQuestionIndex++;
-        selectedAnswerIndex = null;
+        selectedAnswerIndex.clear();
       });
     } else {
       _finishQuiz();
     }
+  }
+
+  bool _isQuestionAnsweredCorrectly(Question question, Set<int> selectedAnswers) {
+    // Проверяем, что выбраны все правильные ответы
+    final correctAnswersSet = question.correctAnswerIndexes.toSet();
+    if (!selectedAnswers.containsAll(correctAnswersSet)) {
+      return false;
+    }
+
+    // Проверяем, что не выбраны неправильные ответы
+    if (selectedAnswers.any((index) => !correctAnswersSet.contains(index))) {
+      return false;
+    }
+
+    return true;
   }
 
   void _finishQuiz() {
@@ -54,6 +81,7 @@ class _QuizScreenState extends State<QuizScreen> {
         builder: (context) => ResultScreen(
           result: result,
           questions: widget.questions,
+          selectedAnswers: selectedAnswersForEachQuestion,
         ),
       ),
     );
@@ -108,7 +136,7 @@ class _QuizScreenState extends State<QuizScreen> {
               child: ListView.builder(
                 itemCount: question.options.length,
                 itemBuilder: (context, index) {
-                  final isSelected = selectedAnswerIndex == index;
+                  final isSelected = selectedAnswerIndex.contains(index);
                   final isCorrect = question.correctAnswerIndexes.contains(index);
 
                   Color? backgroundColor;
@@ -172,7 +200,7 @@ class _QuizScreenState extends State<QuizScreen> {
             // Кнопка "Далее"
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: selectedAnswerIndex != null ? _nextQuestion : null,
+              onPressed: selectedAnswerIndex.isNotEmpty ? _nextQuestion : null,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

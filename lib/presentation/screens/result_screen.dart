@@ -7,8 +7,14 @@ import 'quiz_screen.dart';
 class ResultScreen extends StatelessWidget {
   final QuizResult result;
   final List<Question> questions;
+  final List<Set<int>> selectedAnswers;
 
-  const ResultScreen({super.key, required this.result, required this.questions});
+  const ResultScreen({
+    super.key,
+    required this.result,
+    required this.questions,
+    required this.selectedAnswers,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +92,8 @@ class ResultScreen extends StatelessWidget {
               physics: const NeverScrollableScrollPhysics(),
               itemCount: questions.length,
               itemBuilder: (context, index) {
-                return _buildQuestionCard(context, questions[index], index + 1);
+                final selectedAnswersForQuestion = index < selectedAnswers.length ? selectedAnswers[index] : <int>{};
+                return _buildQuestionCard(context, questions[index], index + 1, selectedAnswersForQuestion);
               },
             ),
 
@@ -148,7 +155,7 @@ class ResultScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildQuestionCard(BuildContext context, Question question, int questionNumber) {
+  Widget _buildQuestionCard(BuildContext context, Question question, int questionNumber, Set<int> selectedAnswers) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -209,20 +216,46 @@ class ResultScreen extends StatelessWidget {
             final index = entry.key;
             final option = entry.value;
             final isCorrect = question.correctAnswerIndexes.contains(index);
+            final isSelected = selectedAnswers.contains(index);
+            final isWrongSelected = isSelected && !isCorrect;
+
+            Color backgroundColor;
+            Color borderColor;
+            Color textColor;
+            Color circleColor;
+            IconData? icon;
+
+            if (isCorrect) {
+              // Правильный ответ
+              backgroundColor = Colors.green.withOpacity(0.1);
+              borderColor = Colors.green.withOpacity(0.5);
+              textColor = Colors.green[800]!;
+              circleColor = Colors.green;
+              icon = Icons.check_circle;
+            } else if (isWrongSelected) {
+              // Неправильно выбранный ответ
+              backgroundColor = Colors.red.withOpacity(0.1);
+              borderColor = Colors.red.withOpacity(0.5);
+              textColor = Colors.red[800]!;
+              circleColor = Colors.red;
+              icon = Icons.cancel;
+            } else {
+              // Обычный ответ
+              backgroundColor = Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3);
+              borderColor = Theme.of(context).colorScheme.outline.withOpacity(0.2);
+              textColor = Theme.of(context).colorScheme.onSurface;
+              circleColor = Theme.of(context).colorScheme.outline.withOpacity(0.3);
+            }
 
             return Container(
               margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
-                color: isCorrect
-                    ? Colors.green.withOpacity(0.1)
-                    : Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                color: backgroundColor,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: isCorrect
-                      ? Colors.green.withOpacity(0.5)
-                      : Theme.of(context).colorScheme.outline.withOpacity(0.2),
-                  width: isCorrect ? 2 : 1,
+                  color: borderColor,
+                  width: (isCorrect || isWrongSelected) ? 2 : 1,
                 ),
               ),
               child: Row(
@@ -232,13 +265,13 @@ class ResultScreen extends StatelessWidget {
                     height: 24,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: isCorrect ? Colors.green : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                      color: circleColor,
                     ),
                     child: Center(
                       child: Text(
                         String.fromCharCode(65 + index), // A, B, C, D
                         style: TextStyle(
-                          color: isCorrect ? Colors.white : Colors.black87,
+                          color: (isCorrect || isWrongSelected) ? Colors.white : Colors.black87,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
                         ),
@@ -250,15 +283,15 @@ class ResultScreen extends StatelessWidget {
                     child: Text(
                       option,
                       style: TextStyle(
-                        color: isCorrect ? Colors.green[800] : Theme.of(context).colorScheme.onSurface,
-                        fontWeight: isCorrect ? FontWeight.w600 : FontWeight.normal,
+                        color: textColor,
+                        fontWeight: (isCorrect || isWrongSelected) ? FontWeight.w600 : FontWeight.normal,
                       ),
                     ),
                   ),
-                  if (isCorrect)
-                    const Icon(
-                      Icons.check_circle,
-                      color: Colors.green,
+                  if (icon != null)
+                    Icon(
+                      icon,
+                      color: isCorrect ? Colors.green : Colors.red,
                       size: 20,
                     ),
                 ],
