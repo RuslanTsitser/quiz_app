@@ -111,7 +111,7 @@ class _QuizScreenState extends State<QuizScreen> {
             Text(
               'Вопрос ${currentQuestionIndex + 1} из ${widget.questions.length}',
               style: Theme.of(context).textTheme.titleMedium,
-              textAlign: TextAlign.center,
+              textAlign: TextAlign.start,
             ),
             const SizedBox(height: 20),
 
@@ -126,7 +126,7 @@ class _QuizScreenState extends State<QuizScreen> {
               child: Text(
                 question.questionText,
                 style: Theme.of(context).textTheme.headlineSmall,
-                textAlign: TextAlign.center,
+                textAlign: TextAlign.start,
               ),
             ),
             const SizedBox(height: 30),
