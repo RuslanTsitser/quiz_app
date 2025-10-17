@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../domain/models/question.dart';
 import '../../domain/models/quiz_result.dart';
+import '../components/ant_design_components.dart';
+import '../theme/ant_design_theme.dart';
 import 'quiz_screen.dart';
 
 class ResultScreen extends StatelessWidget {
@@ -19,9 +21,10 @@ class ResultScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AntDesignTheme.backgroundColor,
       appBar: AppBar(
         title: const Text('Результаты квиза'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        centerTitle: true,
         automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
@@ -29,78 +32,138 @@ class ResultScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Иконка результата
-            Icon(_getResultIcon(), size: 100, color: _getResultColor()),
-            const SizedBox(height: 24),
-
-            // Оценка
-            Text(
-              result.grade,
-              style: Theme.of(
-                context,
-              ).textTheme.headlineLarge?.copyWith(color: _getResultColor(), fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-
-            // Процент правильных ответов
-            Text(
-              '${result.percentage.toStringAsFixed(1)}%',
-              style: Theme.of(
-                context,
-              ).textTheme.displayMedium?.copyWith(color: _getResultColor(), fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
-
-            // Детальная статистика
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.3)),
-              ),
+            // Заголовочная карточка с результатом
+            AntCard(
+              padding: const EdgeInsets.all(32),
               child: Column(
                 children: [
-                  _buildStatRow(context, 'Правильных ответов', result.correctAnswers.toString(), Colors.green),
-                  const SizedBox(height: 12),
-                  _buildStatRow(context, 'Неправильных ответов', result.wrongAnswers.toString(), Colors.red),
-                  const SizedBox(height: 12),
-                  _buildStatRow(
-                    context,
-                    'Всего вопросов',
-                    result.totalQuestions.toString(),
-                    Theme.of(context).colorScheme.primary,
+                  // Иконка результата
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      gradient: _getResultGradient(),
+                      borderRadius: BorderRadius.circular(40),
+                      boxShadow: AntDesignTheme.buttonShadow,
+                    ),
+                    child: Icon(
+                      _getResultIcon(),
+                      size: 40,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Оценка
+                  Text(
+                    result.grade,
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                      color: _getResultColor(),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Процент правильных ответов
+                  Text(
+                    '${result.percentage.toStringAsFixed(1)}%',
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w700,
+                      color: _getResultColor(),
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 32),
 
-            // Список вопросов и ответов
-            Text(
-              'Вопросы и правильные ответы:',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
+            const SizedBox(height: 24),
+
+            // Статистика
+            AntCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Статистика',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AntDesignTheme.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: AntStatistic(
+                          title: 'Правильных',
+                          value: result.correctAnswers.toString(),
+                          valueColor: AntDesignTheme.successColor,
+                        ),
+                      ),
+                      Expanded(
+                        child: AntStatistic(
+                          title: 'Неправильных',
+                          value: result.wrongAnswers.toString(),
+                          valueColor: AntDesignTheme.errorColor,
+                        ),
+                      ),
+                      Expanded(
+                        child: AntStatistic(
+                          title: 'Всего',
+                          value: result.totalQuestions.toString(),
+                          valueColor: AntDesignTheme.primaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
 
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: questions.length,
-              itemBuilder: (context, index) {
-                final selectedAnswersForQuestion = index < selectedAnswers.length ? selectedAnswers[index] : <int>{};
-                return _buildQuestionCard(context, questions[index], index + 1, selectedAnswersForQuestion);
-              },
+            const SizedBox(height: 24),
+
+            // Детальный разбор
+            AntCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Детальный разбор',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AntDesignTheme.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  ...questions.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final question = entry.value;
+                    final selectedAnswersForQuestion = index < selectedAnswers.length
+                        ? selectedAnswers[index]
+                        : <int>{};
+                    return _buildQuestionCard(context, question, index + 1, selectedAnswersForQuestion);
+                  }),
+                ],
+              ),
             ),
 
             const SizedBox(height: 32),
 
             // Кнопки действий
-            ElevatedButton.icon(
+            AntButton(
+              text: 'Пройти квиз снова',
+              type: AntButtonType.primary,
+              size: AntButtonSize.large,
+              icon: Icons.refresh,
+              block: true,
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
@@ -109,50 +172,31 @@ class ResultScreen extends StatelessWidget {
                   ),
                 );
               },
-              icon: const Icon(Icons.refresh),
-              label: const Text('Пройти квиз снова'),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
             ),
             const SizedBox(height: 12),
-            OutlinedButton.icon(
+            AntButton(
+              text: 'На главную',
+              type: AntButtonType.default_,
+              size: AntButtonSize.large,
+              icon: Icons.home,
+              block: true,
               onPressed: () {
                 Navigator.pop(context);
               },
-              icon: const Icon(Icons.home),
-              label: const Text('На главную'),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
             ),
+
+            const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildStatRow(BuildContext context, String label, String value, Color color) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: Theme.of(context).textTheme.bodyLarge),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: color.withOpacity(0.3)),
-          ),
-          child: Text(
-            value,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: color, fontWeight: FontWeight.bold),
-          ),
-        ),
-      ],
-    );
+  LinearGradient _getResultGradient() {
+    if (result.percentage >= 90) return AntDesignTheme.successGradient;
+    if (result.percentage >= 70) return AntDesignTheme.primaryGradient;
+    if (result.percentage >= 50) return AntDesignTheme.warningGradient;
+    return AntDesignTheme.errorGradient;
   }
 
   Widget _buildQuestionCard(BuildContext context, Question question, int questionNumber, Set<int> selectedAnswers) {
@@ -160,18 +204,10 @@ class ResultScreen extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: AntDesignTheme.surfaceColor,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AntDesignTheme.borderColor),
+        boxShadow: AntDesignTheme.cardShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,16 +220,16 @@ class ResultScreen extends StatelessWidget {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary,
-                  borderRadius: BorderRadius.circular(16),
+                  color: AntDesignTheme.primaryColor,
+                  borderRadius: BorderRadius.circular(6),
                 ),
                 child: Center(
                   child: Text(
                     questionNumber.toString(),
                     style: const TextStyle(
                       color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
                     ),
                   ),
                 ),
@@ -202,8 +238,11 @@ class ResultScreen extends StatelessWidget {
               Expanded(
                 child: Text(
                   question.questionText,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  style: const TextStyle(
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
+                    color: AntDesignTheme.textPrimary,
+                    height: 1.4,
                   ),
                 ),
               ),
@@ -227,24 +266,24 @@ class ResultScreen extends StatelessWidget {
 
             if (isCorrect) {
               // Правильный ответ
-              backgroundColor = Colors.green.withOpacity(0.1);
-              borderColor = Colors.green.withOpacity(0.5);
-              textColor = Colors.green[800]!;
-              circleColor = Colors.green;
+              backgroundColor = AntDesignTheme.successColor.withOpacity(0.1);
+              borderColor = AntDesignTheme.successColor.withOpacity(0.3);
+              textColor = AntDesignTheme.successColor;
+              circleColor = AntDesignTheme.successColor;
               icon = Icons.check_circle;
             } else if (isWrongSelected) {
               // Неправильно выбранный ответ
-              backgroundColor = Colors.red.withOpacity(0.1);
-              borderColor = Colors.red.withOpacity(0.5);
-              textColor = Colors.red[800]!;
-              circleColor = Colors.red;
+              backgroundColor = AntDesignTheme.errorColor.withOpacity(0.1);
+              borderColor = AntDesignTheme.errorColor.withOpacity(0.3);
+              textColor = AntDesignTheme.errorColor;
+              circleColor = AntDesignTheme.errorColor;
               icon = Icons.cancel;
             } else {
               // Обычный ответ
-              backgroundColor = Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3);
-              borderColor = Theme.of(context).colorScheme.outline.withOpacity(0.2);
-              textColor = Theme.of(context).colorScheme.onSurface;
-              circleColor = Theme.of(context).colorScheme.outline.withOpacity(0.3);
+              backgroundColor = AntDesignTheme.backgroundColor;
+              borderColor = AntDesignTheme.borderColor;
+              textColor = AntDesignTheme.textSecondary;
+              circleColor = AntDesignTheme.borderColor;
             }
 
             return Container(
@@ -252,7 +291,7 @@ class ResultScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
                 color: backgroundColor,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(6),
                 border: Border.all(
                   color: borderColor,
                   width: (isCorrect || isWrongSelected) ? 2 : 1,
@@ -261,8 +300,8 @@ class ResultScreen extends StatelessWidget {
               child: Row(
                 children: [
                   Container(
-                    width: 24,
-                    height: 24,
+                    width: 20,
+                    height: 20,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: circleColor,
@@ -271,9 +310,9 @@ class ResultScreen extends StatelessWidget {
                       child: Text(
                         String.fromCharCode(65 + index), // A, B, C, D
                         style: TextStyle(
-                          color: (isCorrect || isWrongSelected) ? Colors.white : Colors.black87,
+                          color: (isCorrect || isWrongSelected) ? Colors.white : AntDesignTheme.textSecondary,
                           fontWeight: FontWeight.bold,
-                          fontSize: 12,
+                          fontSize: 10,
                         ),
                       ),
                     ),
@@ -284,15 +323,16 @@ class ResultScreen extends StatelessWidget {
                       option,
                       style: TextStyle(
                         color: textColor,
-                        fontWeight: (isCorrect || isWrongSelected) ? FontWeight.w600 : FontWeight.normal,
+                        fontWeight: (isCorrect || isWrongSelected) ? FontWeight.w500 : FontWeight.normal,
+                        fontSize: 13,
                       ),
                     ),
                   ),
                   if (icon != null)
                     Icon(
                       icon,
-                      color: isCorrect ? Colors.green : Colors.red,
-                      size: 20,
+                      color: isCorrect ? AntDesignTheme.successColor : AntDesignTheme.errorColor,
+                      size: 16,
                     ),
                 ],
               ),
