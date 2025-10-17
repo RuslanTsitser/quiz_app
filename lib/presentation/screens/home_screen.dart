@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../state_manager/questions_notifier.dart';
 import '../components/ant_design_components.dart';
+import '../state_manager/questions_notifier.dart';
 import '../theme/ant_design_theme.dart';
 import 'quiz_screen.dart';
 
@@ -172,7 +172,7 @@ class _BodyState extends State<_Body> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => QuizScreen(questions: questions),
+                      builder: (context) => QuizScreen(questions: questions, quizId: widget.id),
                     ),
                   );
                 },

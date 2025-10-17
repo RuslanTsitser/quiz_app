@@ -5,17 +5,20 @@ import '../../domain/models/quiz_result.dart';
 import '../components/ant_design_components.dart';
 import '../theme/ant_design_theme.dart';
 import 'quiz_screen.dart';
+import 'share_result_screen.dart';
 
 class ResultScreen extends StatelessWidget {
   final QuizResult result;
   final List<Question> questions;
   final List<Set<int>> selectedAnswers;
+  final String quizId;
 
   const ResultScreen({
     super.key,
     required this.result,
     required this.questions,
     required this.selectedAnswers,
+    required this.quizId,
   });
 
   @override
@@ -159,8 +162,27 @@ class ResultScreen extends StatelessWidget {
 
             // Кнопки действий
             AntButton(
-              text: 'Пройти квиз снова',
+              text: 'Поделиться результатом',
               type: AntButtonType.primary,
+              size: AntButtonSize.large,
+              icon: Icons.share,
+              block: true,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ShareResultScreen(
+                      result: result,
+                      quizId: quizId,
+                    ),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 12),
+            AntButton(
+              text: 'Пройти квиз снова',
+              type: AntButtonType.default_,
               size: AntButtonSize.large,
               icon: Icons.refresh,
               block: true,
@@ -168,7 +190,7 @@ class ResultScreen extends StatelessWidget {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => QuizScreen(questions: questions),
+                    builder: (context) => QuizScreen(questions: questions, quizId: quizId),
                   ),
                 );
               },

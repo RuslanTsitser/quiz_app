@@ -7,8 +7,9 @@ import '../theme/ant_design_theme.dart';
 import 'result_screen.dart';
 
 class QuizScreen extends StatefulWidget {
-  const QuizScreen({super.key, required this.questions});
+  const QuizScreen({super.key, required this.questions, required this.quizId});
   final List<Question> questions;
+  final String quizId;
 
   @override
   State<QuizScreen> createState() => _QuizScreenState();
@@ -84,6 +85,7 @@ class _QuizScreenState extends State<QuizScreen> {
           result: result,
           questions: widget.questions,
           selectedAnswers: selectedAnswersForEachQuestion,
+          quizId: widget.quizId,
         ),
       ),
     );
